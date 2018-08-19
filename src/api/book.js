@@ -7,11 +7,19 @@ export function getAllBookInfo() {
   })
 }
 
-export function getUserInfo(token) {
+export function getBookById(id) {
   return request({
-    url: '/user/info',
+    url: '/book',
     method: 'get',
-    params: { token }
+    params: { id }
+  })
+}
+
+export function addBook(book) {
+  return request({
+    url: '/book/add',
+    method: 'post',
+    params: book
   })
 }
 
