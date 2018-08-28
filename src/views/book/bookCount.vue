@@ -9,10 +9,10 @@
               <span>最想看图书榜</span>
             </div>
             <div>
-              <el-table height="265" :data="wantBooksList" style="width: 100%">
-                <el-table-column type="index" width="25" />
+              <el-table height="265" :data="wantReadBookList" style="width: 100%">
+                <el-table-column type="index" width="50" />
                 <el-table-column prop="name" label="书名" />
-                <el-table-column prop="no" label="点赞数" width="auto" />
+                <el-table-column prop="bookThumbsCount" label="点赞数" width="65%" />
               </el-table>
             </div>
           </el-card>
@@ -24,10 +24,10 @@
               <span>最喜爱图书榜</span>
             </div>
             <div class="component-item">
-              <el-table height="265" :data="loveBooksList" style="width: 100%">
+              <el-table height="265" :data="loveBookList" style="width: 100%">
                 <el-table-column type="index" width="50" />
                 <el-table-column prop="name" label="书名" />
-                <el-table-column prop="name" label="点赞数" />
+                <el-table-column prop="bookLoveCount" label="喜爱数" width="65%" />
               </el-table>
             </div>
           </el-card>
@@ -37,12 +37,13 @@
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>高分图书榜</span>
+              <el-button type="text">文字按钮</el-button>
             </div>
             <div class="component-item">
-              <el-table height="265" :data="scoreBooksList" style="width: 100%">
+              <el-table height="265" :data="scoreBookList" style="width: 100%">
                 <el-table-column type="index" width="50" />
                 <el-table-column prop="name" label="书名" />
-                <el-table-column prop="name" label="点赞数" />
+                <el-table-column prop="bookAverageScore" label="评分" width="65%" />
               </el-table>
             </div>
           </el-card>
@@ -54,10 +55,10 @@
               <span>最多评论图书榜</span>
             </div>
             <div>
-              <el-table height="265" class="component-item" :data="commentBooksList" style="width: 100%">
+              <el-table height="265" class="component-item" :data="mostCommentList" style="width: 100%">
                 <el-table-column type="index" width="50" />
                 <el-table-column prop="name" label="书名" />
-                <el-table-column prop="name" label="点赞数" />
+                <el-table-column prop="bookCommentCount" label="评论数" width="65%" />
               </el-table>
             </div>
           </el-card>
@@ -74,29 +75,29 @@
 
 <script>
 import Chart from '@/components/Charts/mixChart'
-import { getAllBookInfo } from '@/api/book'
+import { getBookAndCommentInfo } from '@/api/book'
 
 export default {
   name: 'mixChart',
   components: { Chart },
   data() {
     return {
-      wantBooksList: [],
-      loveBooksList: [],
-      scoreBooksList: [],
-      commentBooksList: [],
-      booksListAll: []
+      wantReadBookList: [],
+      loveBookList: [],
+      scoreBookList: [],
+      mostCommentList: [],
+      booksListAll: {}
     }
   },
   methods: {
     getList() {
-      getAllBookInfo().then(response => {
+      getBookAndCommentInfo().then(response => {
         this.booksListAll = response.data
         console.log(this.booksListAll)
-        this.wantBooksList = this.booksListAll.slice(0, 10)
-        this.loveBooksList = this.booksListAll.slice(0, 10)
-        this.scoreBooksList = this.booksListAll.slice(0, 10)
-        this.commentBooksList = this.booksListAll.slice(0, 10)
+        this.wantReadBookList = this.booksListAll.wantReadBookList.slice(0, 10)
+        this.loveBookList = this.booksListAll.loveBookList.slice(0, 10)
+        this.scoreBookList = this.booksListAll.scoreBookList.slice(0, 10)
+        this.mostCommentList = this.booksListAll.mostCommentList.slice(0, 10)
       })
     }
   },
@@ -112,10 +113,13 @@ export default {
   padding: 15px;
   min-height: calc(100vh - 84px);
 }
-.chart-container{
+.chart-container {
   position: relative;
-  padding: 15px 0px 0px 0px;;
+  padding: 15px 0px 0px 0px;
   width: 100%;
-  height:400px;
+  height: 400px;
+}
+.moreBtn {
+  margin-left: 5px;
 }
 </style>

@@ -23,3 +23,10 @@ export function addBook(book) {
   })
 }
 
+export function getBookAndCommentInfo() {
+  return request({
+    url: '/book/count',
+    method: 'get'
+  })
+}
+
