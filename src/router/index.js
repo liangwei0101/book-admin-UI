@@ -155,7 +155,16 @@ export const asyncRouterMap = [
         path: 'bookAdmin',
         component: () => import('@/views/book/bookAdmin'),
         name: 'bookAdmin',
-        meta: { title: 'bookAdmin' }
+        meta: { title: 'bookAdmin' },
+        children: [{
+          path: 'bookDetail',
+          component: () => import('@/views/book/bookDetail'),
+          name: 'bookDetail',
+          meta: {
+            title: 'bookDetail'
+          }
+        }
+        ]
       }
     ]
   },

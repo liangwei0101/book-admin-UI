@@ -1,130 +1,402 @@
+
 <template>
-<div class="app-container">
-
-    <el-table :data="list" v-loading="listLoading" fit highlight-current-row style="width: 100%">
-
-      <el-table-column prop="no" align="center" width="*" label="序号" />
-
-      <el-table-column prop="name" align="center" width="*"  label="书名">
-      </el-table-column>
-
-      <el-table-column prop="author" align="center" width="*" label="作者">
-      </el-table-column>
-
-    </el-table>
+  <div class="app-container">
+    <el-row>
+      <el-col v-for="item in titleList" :key="item.iconName" :span="8">
+        <card :book="item"></card>
+      </el-col>
+    </el-row>
+    <el-row padding class="title-container">
+      <custom-avatar :iconName="'menu'" :bgColor="'blue'" xsmall></custom-avatar>
+      <span class="title">图书信息</span>
+    </el-row>
+    <el-row>
+      <el-row class="operation" :gutter="20" type="flex" justify="space-around">
+        <el-col :span="6">
+          <el-input placeholder="请输入" class="custom-input" suffix-icon="el-icon-edit" label="图书ID">
+            <span slot="prepend">图书ID:</span>
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <el-input placeholder="请输入" class="custom-input" suffix-icon="el-icon-edit" label="图书ID">
+            <span slot="prepend">书名:</span>
+          </el-input>
+        </el-col>
+        <el-col :span="6">
+          <div class="select">
+            <span class="select-title">图书状态：</span>
+            <el-select placeholder="请选择" v-model="value">
+              <el-option label="餐厅名" value="1"></el-option>
+              <el-option label="订单号" value="2"></el-option>
+              <el-option label="用户电话" value="3"></el-option>
+            </el-select>
+          </div>
+        </el-col>
+        <el-button type="primary">查询</el-button>
+      </el-row>
+      <el-row>
+        <el-row padding type="flex" justify="space-between">
+          <div flex-layout>
+            <div class="tag"></div>
+            <span class="title">图书列表</span>
+          </div>
+          <div class="button-group">
+            <el-button type="primary" icon="el-icon-plus">添加</el-button>
+            <el-button type="primary" icon="el-icon-edit">修改</el-button>
+            <el-button type="primary" icon="el-icon-delete">下架</el-button>
+          </div>
+        </el-row>
+        <el-row>
+          <el-col :span="8" class="book-list">
+            <el-collapse  @change="goToBookDetail">
+              <el-collapse-item v-for="item in bookList" :title="item.id+':'+item.name" :key="item.name" :name="item.id" >
+                <el-table :data="item.children" :show-header="false">
+                  <el-table-column prop="id" label="编号">
+                  </el-table-column>
+                  <el-table-column prop="status" label="状态">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.statusTag"
+                           disable-transitions>{{scope.row.statusName}}</el-tag>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-collapse-item>
+            </el-collapse>
+          </el-col>
+          <el-col :span="16">
+            <router-view></router-view>
+          </el-col>
+        </el-row>
+      </el-row>
+    </el-row>
   </div>
 </template>
 
 <script>
-import { getAllBookInfo, addBook } from "@/api/book";
-import waves from "@/directive/waves"; // 水波纹指令
+import { getAllBookInfo, addBook } from '@/api/book'
+import Card from '@/components/Card'
+import CustomAvatar from '@/components/CustomAvatar'
+import { BookStatus } from '@/model/common'
+
+import waves from '@/directive/waves' // 水波纹指令
 
 const calendarTypeOptions = [
-  { key: "CN", display_name: "China" },
-  { key: "US", display_name: "USA" },
-  { key: "JP", display_name: "Japan" },
-  { key: "EU", display_name: "Eurozone" }
-];
+  {
+    key: 'CN',
+    display_name: 'China'
+  },
+  {
+    key: 'US',
+    display_name: 'USA'
+  },
+  {
+    key: 'JP',
+    display_name: 'Japan'
+  },
+  {
+    key: 'EU',
+    display_name: 'Eurozone'
+  }
+]
 
 // arr to obj ,such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name;
-  return acc;
-}, {});
+  acc[cur.key] = cur.display_name
+  return acc
+}, {})
 
 export default {
-  name: "complexTable",
+  name: 'complexTable',
   directives: {
     waves
   },
+  components: {
+    Card,
+    CustomAvatar
+  },
   data() {
     return {
+      value: '',
       tableKey: 0,
       list: null,
       total: null,
-      listLoading: true,
+      listLoading: false,
       importanceOptions: [1, 2, 3],
       calendarTypeOptions,
       sortOptions: [
-        { label: "ID Ascending", key: "+id" },
-        { label: "ID Descending", key: "-id" }
+        {
+          label: 'ID Ascending',
+          key: '+id'
+        },
+        {
+          label: 'ID Descending',
+          key: '-id'
+        }
       ],
-      statusOptions: ["published", "draft", "deleted"],
+      statusOptions: ['published', 'draft', 'deleted'],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published"
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create"
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         type: [
-          { required: true, message: "type is required", trigger: "change" }
+          {
+            required: true,
+            message: 'type is required',
+            trigger: 'change'
+          }
         ],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change"
+            message: 'timestamp is required',
+            trigger: 'change'
           }
         ],
         title: [
-          { required: true, message: "title is required", trigger: "blur" }
+          {
+            required: true,
+            message: 'title is required',
+            trigger: 'blur'
+          }
         ]
       },
-      downloadLoading: false
-    };
+      downloadLoading: false,
+      titleList: [],
+      bookList: []
+    }
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger"
-      };
-      return statusMap[status];
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type];
+      return calendarTypeKeyValue[type]
     }
   },
   created() {
-    this.getList();
-    this.addBookInfo();
+    this.getList()
+    this.addBookInfo()
   },
   methods: {
     getList() {
-      this.listLoading = true;
-      getAllBookInfo().then(response => {
-        this.list = response.data;
-        this.listLoading = false;
-      });
+      this.listLoading = false
+      this.titleList = [
+        {
+          iconName: 'all-book',
+          count: 1000,
+          title: '图书总量',
+          bgColor: 'orange'
+        },
+        {
+          iconName: 'borrow-book',
+          count: 2000,
+          title: '借阅数量',
+          bgColor: 'purple'
+        },
+        {
+          iconName: 'dead-line-book',
+          count: 3000,
+          title: '到期未还书数量',
+          bgColor: 'green'
+        }
+      ]
+      this.bookList = [
+        {
+          id: '123',
+          name: '异世龙傲天传奇1',
+          children: [
+            {
+              id: '123',
+              name: '异世龙傲天传奇2',
+              status: 1
+            },
+            {
+              id: '234',
+              name: '异世龙傲天传奇3',
+              status: 2
+            }
+          ]
+        },
+        {
+          id: '235',
+          name: '异世龙傲天传奇4',
+          children: [
+            {
+              id: '123',
+              name: '异世龙傲天传奇5',
+              status: 0,
+              statusTag: ''
+            },
+            {
+              id: '234',
+              name: '异世龙傲天传奇6',
+              status: 1,
+              statusTag: 'success'
+            },
+            {
+              id: '234',
+              name: '异世龙傲天传奇',
+              status: 2,
+              statusTag: 'danger'
+            },
+            {
+              id: '234',
+              name: '异世龙傲天传奇',
+              status: 3,
+              statusTag: 'info'
+            }
+          ]
+        }
+      ]
+      this.bookList.forEach(item => {
+        item.children.forEach(element => {
+          switch (element.status) {
+            case BookStatus.NoBorrowed:
+              element['statusTag'] = ''
+              element['statusName'] = '架上'
+              break
+            case BookStatus.Bororwed:
+              element['statusTag'] = 'success'
+              element['statusName'] = '未还'
+              break
+            case BookStatus.Delay:
+              element['statusTag'] = 'danger'
+              element['statusName'] = '延期'
+              break
+            case BookStatus.Locked:
+              element['statusTag'] = 'info'
+              element['statusName'] = '锁定'
+              break
+          }
+        })
+      })
     },
-    addBookInfo () {
-       var book = {
+    addBookInfo() {
+      var book = {
         no: 1,
         name: '放弃',
         author: '梁伟',
         status: 0,
         introduce: '无',
         url: ''
-      };
+      }
       addBook(book).then(response => {
-        var aa = response.data;
-      });
+        var aa = response.data
+      })
+    },
+    goToBookDetail(val) {
+      console.log('123')
+
+      this.$router.push({ name: 'bookDetail' })
     }
   }
-};
+}
 </script>
+
+<style rel="stylesheet/scss" lang="scss">
+@import "@/styles/common.scss";
+.title-container {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  margin-top: 8px;
+  background-color: $white;
+  border-bottom: $border-line;
+}
+
+.title {
+  font-weight: $semibold;
+  font-size: $font-18;
+}
+
+.custom-input {
+  .el-input-group__prepend {
+    border: none;
+    border-radius: 0px;
+    padding: 0;
+    width: auto;
+    padding-right: 5px;
+    background-color: transparent;
+    color: $gray;
+  }
+}
+
+.select {
+  display: flex;
+  align-items: center;
+  .select-title {
+    white-space: nowrap;
+    font-size: $font-14;
+    color: $gray;
+  }
+}
+
+.operation {
+  margin-top: 10px;
+  padding: 20px 60px;
+  background-color: #f9f9f9;
+  border: $border-line;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+}
+
+.tag {
+  width: 5px;
+  height: inherit;
+  background-color: $blue;
+  margin-right: 10px;
+}
+
+.button-group {
+  display: flex;
+  overflow: hiden;
+  .el-button--medium {
+    padding: 5px 10px !important;
+  }
+}
+.el-table::before {
+  display: none;
+}
+table {
+  border-left: 1px solid #ebeef5 !important;
+  td {
+    border: 0px;
+  }
+}
+.el-collapse-item__header {
+  background-color: #f7f7f7;
+  border: 1px solid #ebeef5;
+  border-top: 0px;
+  border-bottom: 1px solid #ebeef5 !important;
+}
+.el-collapse-item__wrap {
+  border-bottom: 0px;
+  .el-collapse-item__content {
+    padding-bottom: 0px;
+
+    .el-table__body-wrapper {
+      border-right: 1px solid #ebeef5 !important;
+    }
+  }
+}
+</style>

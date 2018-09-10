@@ -1,0 +1,61 @@
+//color
+$white:#fff;
+$blue:#6dcfeb;
+$light-blue:#3A71A8;
+$red:#C03639;
+$pink: #E65D6E;
+$green: #30B08F;
+$purple:#a596e1;
+$yellow:#FEC171;
+$orange:#f99273;
+$gray:#6a6a6a;
+$tiffany: #4AB7BD;
+$panGreen: #30B08F;
+//sidebar
+$menuBg:#304156;
+$subMenuBg:#1f2d3d;
+$menuHover:#001528;
+$theme-black:#333333;
+//font-size
+$font-48:48px;
+$font-18:18px;
+$font-16:16px;
+$font-14:14px;
+$font-24:24px;
+$font-20:20px;
+$font-10:10px;
+
+//font-weight
+$semibold:500;
+$medium:450;
+$regular:300;
+//commom-style
+*[bg-color="yellow"] {
+  background-color: $yellow;
+}
+
+*[bg-color="purple"] {
+  background-color: $purple;
+}
+
+*[bg-color="green"] {
+  background-color: $green;
+}
+
+*[bg-color="orange"] {
+  background-color: $orange;
+}
+
+*[padding] {
+  padding: 10px 16px;
+}
+
+*[flex-layout] {
+  display: flex;
+  &[center]{
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+$border-line: 0.55px solid rgba(0, 0, 0, 0.1);
