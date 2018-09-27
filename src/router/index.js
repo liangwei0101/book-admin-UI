@@ -30,76 +30,89 @@ import nestedRouter from './modules/nested'
     noCache: true                if true ,the page will no be cached(default is false)
   }
 **/
-export const constantRouterMap = [
-  {
+export const constantRouterMap = [{
     path: '/login',
-    component: () => import('@/views/login/index'),
+    component: () =>
+      import('@/views/login/index'),
     hidden: true
   },
   {
     path: '/authredirect',
-    component: () => import('@/views/login/authredirect'),
+    component: () =>
+      import('@/views/login/authredirect'),
     hidden: true
   },
   {
     path: '/404',
-    component: () => import('@/views/errorPage/404'),
+    component: () =>
+      import('@/views/errorPage/404'),
     hidden: true
   },
   {
     path: '/401',
-    component: () => import('@/views/errorPage/401'),
+    component: () =>
+      import('@/views/errorPage/401'),
     hidden: true
   },
   {
     path: '',
     component: Layout,
     redirect: 'dashboard',
-    children: [
-      {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+    children: [{
+      path: 'dashboard',
+      component: () =>
+        import('@/views/dashboard/index'),
+      name: 'dashboard',
+      meta: {
+        title: 'dashboard',
+        icon: 'dashboard',
+        noCache: true
       }
-    ]
+    }]
   },
   {
     path: '/documentation',
     component: Layout,
     redirect: '/documentation/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'documentation',
-        meta: { title: 'documentation', icon: 'documentation', noCache: true }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/documentation/index'),
+      name: 'documentation',
+      meta: {
+        title: 'documentation',
+        icon: 'documentation',
+        noCache: true
       }
-    ]
+    }]
   },
   {
     path: '/guide',
     component: Layout,
     redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'guide',
-        meta: { title: 'guide', icon: 'guide', noCache: true }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/guide/index'),
+      name: 'guide',
+      meta: {
+        title: 'guide',
+        icon: 'guide',
+        noCache: true
       }
-    ]
+    }]
   }
 ]
 
 export default new Router({
   // mode: 'history', // require service support
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRouterMap
 })
 
-export const asyncRouterMap = [
-  {
+export const asyncRouterMap = [{
     path: '/permission',
     component: Layout,
     redirect: '/permission/index',
@@ -109,10 +122,10 @@ export const asyncRouterMap = [
       icon: 'lock',
       roles: ['admin', 'editor'] // you can set roles in root nav
     },
-    children: [
-      {
+    children: [{
         path: 'page',
-        component: () => import('@/views/permission/page'),
+        component: () =>
+          import('@/views/permission/page'),
         name: 'pagePermission',
         meta: {
           title: 'pagePermission',
@@ -121,7 +134,8 @@ export const asyncRouterMap = [
       },
       {
         path: 'directive',
-        component: () => import('@/views/permission/directive'),
+        component: () =>
+          import('@/views/permission/directive'),
         name: 'directivePermission',
         meta: {
           title: 'directivePermission'
@@ -137,34 +151,36 @@ export const asyncRouterMap = [
     redirect: 'bookCount',
     name: 'book',
     alwaysShow: true,
-    meta: { title: 'book', icon: 'excel' },
-    children: [
-      {
+    meta: {
+      title: 'book',
+      icon: 'excel'
+    },
+    children: [{
         path: 'bookCount',
-        component: () => import('@/views/book/bookCount'),
+        component: () =>
+          import('@/views/book/bookCount'),
         name: 'bookCount',
-        meta: { title: 'bookCount' }
+        meta: {
+          title: 'bookCount'
+        }
       },
       {
         path: 'bookBorrowManage',
-        component: () => import('@/views/book/bookBorrowManage'),
+        component: () =>
+          import('@/views/book/bookBorrowManage'),
         name: 'bookBorrowManage',
-        meta: { title: 'bookBorrowManage' }
+        meta: {
+          title: 'bookBorrowManage'
+        }
       },
       {
         path: 'bookAdmin',
-        component: () => import('@/views/book/bookAdmin'),
+        component: () =>
+          import('@/views/book/bookAdmin'),
         name: 'bookAdmin',
-        meta: { title: 'bookAdmin' },
-        children: [{
-          path: 'bookDetail',
-          component: () => import('@/views/book/bookDetail'),
-          name: 'bookDetail',
-          meta: {
-            title: 'bookDetail'
-          }
+        meta: {
+          title: 'bookAdmin'
         }
-        ]
       }
     ]
   },
@@ -172,14 +188,17 @@ export const asyncRouterMap = [
   {
     path: '/icon',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/svg-icons/index'),
-        name: 'icons',
-        meta: { title: 'icons', icon: 'icon', noCache: true }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/svg-icons/index'),
+      name: 'icons',
+      meta: {
+        title: 'icons',
+        icon: 'icon',
+        noCache: true
       }
-    ]
+    }]
   },
 
   /** When your routing table is too long, you can split it into small modules**/
@@ -197,25 +216,36 @@ export const asyncRouterMap = [
       title: 'example',
       icon: 'example'
     },
-    children: [
-      {
+    children: [{
         path: 'create',
-        component: () => import('@/views/example/create'),
+        component: () =>
+          import('@/views/example/create'),
         name: 'createArticle',
-        meta: { title: 'createArticle', icon: 'edit' }
+        meta: {
+          title: 'createArticle',
+          icon: 'edit'
+        }
       },
       {
         path: 'edit/:id(\\d+)',
-        component: () => import('@/views/example/edit'),
+        component: () =>
+          import('@/views/example/edit'),
         name: 'editArticle',
-        meta: { title: 'editArticle', noCache: true },
+        meta: {
+          title: 'editArticle',
+          noCache: true
+        },
         hidden: true
       },
       {
         path: 'list',
-        component: () => import('@/views/example/list'),
+        component: () =>
+          import('@/views/example/list'),
         name: 'articleList',
-        meta: { title: 'articleList', icon: 'list' }
+        meta: {
+          title: 'articleList',
+          icon: 'list'
+        }
       }
     ]
   },
@@ -223,14 +253,16 @@ export const asyncRouterMap = [
   {
     path: '/tab',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/tab/index'),
-        name: 'tab',
-        meta: { title: 'tab', icon: 'tab' }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/tab/index'),
+      name: 'tab',
+      meta: {
+        title: 'tab',
+        icon: 'tab'
       }
-    ]
+    }]
   },
 
   {
@@ -242,18 +274,25 @@ export const asyncRouterMap = [
       title: 'errorPages',
       icon: '404'
     },
-    children: [
-      {
+    children: [{
         path: '401',
-        component: () => import('@/views/errorPage/401'),
+        component: () =>
+          import('@/views/errorPage/401'),
         name: 'page401',
-        meta: { title: 'page401', noCache: true }
+        meta: {
+          title: 'page401',
+          noCache: true
+        }
       },
       {
         path: '404',
-        component: () => import('@/views/errorPage/404'),
+        component: () =>
+          import('@/views/errorPage/404'),
         name: 'page404',
-        meta: { title: 'page404', noCache: true }
+        meta: {
+          title: 'page404',
+          noCache: true
+        }
       }
     ]
   },
@@ -262,14 +301,16 @@ export const asyncRouterMap = [
     path: '/error-log',
     component: Layout,
     redirect: 'noredirect',
-    children: [
-      {
-        path: 'log',
-        component: () => import('@/views/errorLog/index'),
-        name: 'errorLog',
-        meta: { title: 'errorLog', icon: 'bug' }
+    children: [{
+      path: 'log',
+      component: () =>
+        import('@/views/errorLog/index'),
+      name: 'errorLog',
+      meta: {
+        title: 'errorLog',
+        icon: 'bug'
       }
-    ]
+    }]
   },
 
   {
@@ -281,24 +322,32 @@ export const asyncRouterMap = [
       title: 'excel',
       icon: 'excel'
     },
-    children: [
-      {
+    children: [{
         path: 'export-excel',
-        component: () => import('@/views/excel/exportExcel'),
+        component: () =>
+          import('@/views/excel/exportExcel'),
         name: 'exportExcel',
-        meta: { title: 'exportExcel' }
+        meta: {
+          title: 'exportExcel'
+        }
       },
       {
         path: 'export-selected-excel',
-        component: () => import('@/views/excel/selectExcel'),
+        component: () =>
+          import('@/views/excel/selectExcel'),
         name: 'selectExcel',
-        meta: { title: 'selectExcel' }
+        meta: {
+          title: 'selectExcel'
+        }
       },
       {
         path: 'upload-excel',
-        component: () => import('@/views/excel/uploadExcel'),
+        component: () =>
+          import('@/views/excel/uploadExcel'),
         name: 'uploadExcel',
-        meta: { title: 'uploadExcel' }
+        meta: {
+          title: 'uploadExcel'
+        }
       }
     ]
   },
@@ -308,57 +357,71 @@ export const asyncRouterMap = [
     component: Layout,
     redirect: '/zip/download',
     alwaysShow: true,
-    meta: { title: 'zip', icon: 'zip' },
-    children: [
-      {
-        path: 'download',
-        component: () => import('@/views/zip/index'),
-        name: 'exportZip',
-        meta: { title: 'exportZip' }
+    meta: {
+      title: 'zip',
+      icon: 'zip'
+    },
+    children: [{
+      path: 'download',
+      component: () =>
+        import('@/views/zip/index'),
+      name: 'exportZip',
+      meta: {
+        title: 'exportZip'
       }
-    ]
+    }]
   },
 
   {
     path: '/theme',
     component: Layout,
     redirect: 'noredirect',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/theme/index'),
-        name: 'theme',
-        meta: { title: 'theme', icon: 'theme' }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/theme/index'),
+      name: 'theme',
+      meta: {
+        title: 'theme',
+        icon: 'theme'
       }
-    ]
+    }]
   },
 
   {
     path: '/clipboard',
     component: Layout,
     redirect: 'noredirect',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/clipboard/index'),
-        name: 'clipboardDemo',
-        meta: { title: 'clipboardDemo', icon: 'clipboard' }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/clipboard/index'),
+      name: 'clipboardDemo',
+      meta: {
+        title: 'clipboardDemo',
+        icon: 'clipboard'
       }
-    ]
+    }]
   },
 
   {
     path: '/i18n',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/i18n-demo/index'),
-        name: 'i18n',
-        meta: { title: 'i18n', icon: 'international' }
+    children: [{
+      path: 'index',
+      component: () =>
+        import('@/views/i18n-demo/index'),
+      name: 'i18n',
+      meta: {
+        title: 'i18n',
+        icon: 'international'
       }
-    ]
+    }]
   },
 
-  { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
 ]

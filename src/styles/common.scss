@@ -29,6 +29,7 @@ $font-10:10px;
 $semibold:500;
 $medium:450;
 $regular:300;
+
 //commom-style
 *[bg-color="yellow"] {
   background-color: $yellow;
@@ -52,10 +53,12 @@ $regular:300;
 
 *[flex-layout] {
   display: flex;
-  &[center]{
+
+  &[center] {
     justify-content: center;
     align-items: center;
   }
 }
 
 $border-line: 0.55px solid rgba(0, 0, 0, 0.1);
+$spilt-line:1px solid #ebeef5;

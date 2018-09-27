@@ -36,10 +36,7 @@
       </el-row>
       <el-row>
         <el-row padding type="flex" justify="space-between">
-          <div flex-layout>
-            <div class="tag"></div>
-            <span class="title">图书列表</span>
-          </div>
+          <custom-title title="图书列表"></custom-title>
           <div class="button-group">
             <el-button type="primary" icon="el-icon-plus">添加</el-button>
             <el-button type="primary" icon="el-icon-edit">修改</el-button>
@@ -48,23 +45,25 @@
         </el-row>
         <el-row>
           <el-col :span="8" class="book-list">
-            <el-collapse  @change="goToBookDetail">
-              <el-collapse-item v-for="item in bookList" :title="item.id+':'+item.name" :key="item.name" :name="item.id" >
-                <el-table :data="item.children" :show-header="false">
+            <el-collapse @change="goToBookDetail">
+              <el-collapse-item v-for="item in bookList" :title="item.id+':'+item.name" :key="item.name" :name="item.id">
+                <el-table :data="item.children" :show-header="false" @row-click="goToBorrowHistory">
                   <el-table-column prop="id" label="编号">
                   </el-table-column>
                   <el-table-column prop="status" label="状态">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.statusTag"
-                           disable-transitions>{{scope.row.statusName}}</el-tag>
+                         <el-tag :type="scope.row.statusTag" disable-transitions>{{scope.row.statusName}}</el-tag>
                     </template>
                   </el-table-column>
                 </el-table>
               </el-collapse-item>
             </el-collapse>
           </el-col>
-          <el-col :span="16">
-            <router-view></router-view>
+          <el-col :span="16" v-if="isShowBookDetail">
+            <book-detail></book-detail>
+          </el-col>
+          <el-col :span="16" v-if="!isShowBookDetail" class="history-borrow" padding>
+            <history-borrow></history-borrow>
           </el-col>
         </el-row>
       </el-row>
@@ -73,50 +72,56 @@
 </template>
 
 <script>
-import { getAllBookInfo, addBook } from '@/api/book'
-import Card from '@/components/Card'
-import CustomAvatar from '@/components/CustomAvatar'
-import { BookStatus } from '@/model/common'
+import BookDetail from "@/components/BookDetail";
+import HistoryBorrow from "@/components/HistoryBorrow";
+import { getAllBookInfo, addBook } from "@/api/book";
+import Card from "@/components/Card";
+import CustomAvatar from "@/components/CustomAvatar";
+import CustomTitle from "@/components/CustomTitle";
+import { BookStatus } from "@/model/common";
 
-import waves from '@/directive/waves' // 水波纹指令
+import waves from "@/directive/waves"; // 水波纹指令
 
 const calendarTypeOptions = [
   {
-    key: 'CN',
-    display_name: 'China'
+    key: "CN",
+    display_name: "China"
   },
   {
-    key: 'US',
-    display_name: 'USA'
+    key: "US",
+    display_name: "USA"
   },
   {
-    key: 'JP',
-    display_name: 'Japan'
+    key: "JP",
+    display_name: "Japan"
   },
   {
-    key: 'EU',
-    display_name: 'Eurozone'
+    key: "EU",
+    display_name: "Eurozone"
   }
-]
+];
 
 // arr to obj ,such as { CN : "China", US : "USA" }
 const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
+  acc[cur.key] = cur.display_name;
+  return acc;
+}, {});
 
 export default {
-  name: 'complexTable',
+  name: "complexTable",
   directives: {
     waves
   },
   components: {
     Card,
-    CustomAvatar
+    CustomAvatar,
+    CustomTitle,
+    BookDetail,
+    HistoryBorrow
   },
   data() {
     return {
-      value: '',
+      value: "",
       tableKey: 0,
       list: null,
       total: null,
@@ -125,30 +130,30 @@ export default {
       calendarTypeOptions,
       sortOptions: [
         {
-          label: 'ID Ascending',
-          key: '+id'
+          label: "ID Ascending",
+          key: "+id"
         },
         {
-          label: 'ID Descending',
-          key: '-id'
+          label: "ID Descending",
+          key: "-id"
         }
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
+      statusOptions: ["published", "draft", "deleted"],
       showReviewer: false,
       temp: {
         id: undefined,
         importance: 1,
-        remark: '',
+        remark: "",
         timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        title: "",
+        type: "",
+        status: "published"
       },
       dialogFormVisible: false,
-      dialogStatus: '',
+      dialogStatus: "",
       textMap: {
-        update: 'Edit',
-        create: 'Create'
+        update: "Edit",
+        create: "Create"
       },
       dialogPvVisible: false,
       pvData: [],
@@ -156,165 +161,167 @@ export default {
         type: [
           {
             required: true,
-            message: 'type is required',
-            trigger: 'change'
+            message: "type is required",
+            trigger: "change"
           }
         ],
         timestamp: [
           {
-            type: 'date',
+            type: "date",
             required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
+            message: "timestamp is required",
+            trigger: "change"
           }
         ],
         title: [
           {
             required: true,
-            message: 'title is required',
-            trigger: 'blur'
+            message: "title is required",
+            trigger: "blur"
           }
         ]
       },
       downloadLoading: false,
       titleList: [],
-      bookList: []
-    }
+      bookList: [],
+      isShowBookDetail: true
+    };
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
-      }
-      return statusMap[status]
+        published: "success",
+        draft: "info",
+        deleted: "danger"
+      };
+      return statusMap[status];
     },
     typeFilter(type) {
-      return calendarTypeKeyValue[type]
+      return calendarTypeKeyValue[type];
     }
   },
   created() {
-    this.getList()
-    this.addBookInfo()
+    this.getList();
+    this.addBookInfo();
   },
   methods: {
     getList() {
-      this.listLoading = false
+      this.listLoading = false;
       this.titleList = [
         {
-          iconName: 'all-book',
+          iconName: "all-book",
           count: 1000,
-          title: '图书总量',
-          bgColor: 'orange'
+          title: "图书总量",
+          bgColor: "orange"
         },
         {
-          iconName: 'borrow-book',
+          iconName: "borrow-book",
           count: 2000,
-          title: '借阅数量',
-          bgColor: 'purple'
+          title: "借阅数量",
+          bgColor: "purple"
         },
         {
-          iconName: 'dead-line-book',
+          iconName: "dead-line-book",
           count: 3000,
-          title: '到期未还书数量',
-          bgColor: 'green'
+          title: "到期未还书数量",
+          bgColor: "green"
         }
-      ]
+      ];
       this.bookList = [
         {
-          id: '123',
-          name: '异世龙傲天传奇1',
+          id: "123",
+          name: "异世龙傲天传奇1",
           children: [
             {
-              id: '123',
-              name: '异世龙傲天传奇2',
+              id: "123",
+              name: "异世龙傲天传奇2",
               status: 1
             },
             {
-              id: '234',
-              name: '异世龙傲天传奇3',
+              id: "234",
+              name: "异世龙傲天传奇3",
               status: 2
             }
           ]
         },
         {
-          id: '235',
-          name: '异世龙傲天传奇4',
+          id: "235",
+          name: "异世龙傲天传奇4",
           children: [
             {
-              id: '123',
-              name: '异世龙傲天传奇5',
+              id: "123",
+              name: "异世龙傲天传奇5",
               status: 0,
-              statusTag: ''
+              statusTag: ""
             },
             {
-              id: '234',
-              name: '异世龙傲天传奇6',
+              id: "234",
+              name: "异世龙傲天传奇6",
               status: 1,
-              statusTag: 'success'
+              statusTag: "success"
             },
             {
-              id: '234',
-              name: '异世龙傲天传奇',
+              id: "234",
+              name: "异世龙傲天传奇",
               status: 2,
-              statusTag: 'danger'
+              statusTag: "danger"
             },
             {
-              id: '234',
-              name: '异世龙傲天传奇',
+              id: "234",
+              name: "异世龙傲天传奇",
               status: 3,
-              statusTag: 'info'
+              statusTag: "info"
             }
           ]
         }
-      ]
+      ];
       this.bookList.forEach(item => {
         item.children.forEach(element => {
           switch (element.status) {
             case BookStatus.NoBorrowed:
-              element['statusTag'] = ''
-              element['statusName'] = '架上'
-              break
+              element["statusTag"] = "";
+              element["statusName"] = "架上";
+              break;
             case BookStatus.Bororwed:
-              element['statusTag'] = 'success'
-              element['statusName'] = '未还'
-              break
+              element["statusTag"] = "success";
+              element["statusName"] = "未还";
+              break;
             case BookStatus.Delay:
-              element['statusTag'] = 'danger'
-              element['statusName'] = '延期'
-              break
+              element["statusTag"] = "danger";
+              element["statusName"] = "延期";
+              break;
             case BookStatus.Locked:
-              element['statusTag'] = 'info'
-              element['statusName'] = '锁定'
-              break
+              element["statusTag"] = "info";
+              element["statusName"] = "锁定";
+              break;
           }
-        })
-      })
+        });
+      });
     },
     addBookInfo() {
       var book = {
         no: 1,
-        name: '放弃',
-        author: '梁伟',
+        name: "放弃",
+        author: "梁伟",
         status: 0,
-        introduce: '无',
-        url: ''
-      }
+        introduce: "无",
+        url: ""
+      };
       addBook(book).then(response => {
-        var aa = response.data
-      })
+        var aa = response.data;
+      });
     },
     goToBookDetail(val) {
-      console.log('123')
-
-      this.$router.push({ name: 'bookDetail' })
+      this.isShowBookDetail = true;
+    },
+    goToBorrowHistory(row, event, column) {
+      this.isShowBookDetail = false;
     }
   }
-}
+};
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scope>
 @import "@/styles/common.scss";
 .title-container {
   padding-top: 9px;
@@ -360,13 +367,6 @@ export default {
   margin-right: 0px !important;
 }
 
-.tag {
-  width: 5px;
-  height: inherit;
-  background-color: $blue;
-  margin-right: 10px;
-}
-
 .button-group {
   display: flex;
   overflow: hiden;
@@ -374,29 +374,36 @@ export default {
     padding: 5px 10px !important;
   }
 }
+
 .el-table::before {
   display: none;
 }
-table {
-  border-left: 1px solid #ebeef5 !important;
-  td {
-    border: 0px;
+.book-list {
+  table {
+    border-left: 1px solid #ebeef5 !important;
+    td {
+      border: 0px;
+    }
   }
 }
+
 .el-collapse-item__header {
   background-color: #f7f7f7;
   border: 1px solid #ebeef5;
   border-top: 0px;
   border-bottom: 1px solid #ebeef5 !important;
 }
+
 .el-collapse-item__wrap {
   border-bottom: 0px;
   .el-collapse-item__content {
     padding-bottom: 0px;
-
     .el-table__body-wrapper {
       border-right: 1px solid #ebeef5 !important;
     }
   }
+}
+.history-borrow {
+  border: $spilt-line;
 }
 </style>
